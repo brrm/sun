@@ -49,7 +49,12 @@ func getgeolocationdata(ip string) geolocationdata {
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
 	// Extract data from response and return it
-	return geolocationdata{Ip: ip, Country: gjson.Get(string(body), "country_name").String(), City: gjson.Get(string(body), "city").String()}
+	// If in US
+	if gjson.Get(string(body), "country_code").String() == "US" {
+		// Return state instead of country
+		return geolocationdata{Ip: ip, Country: gjson.Get(string(body), "region_code").String(), City: gjson.Get(string(body), "city").String()}
+	}
+	return geolocationdata{Ip: ip, Country: gjson.Get(string(body), "country_code").String(), City: gjson.Get(string(body), "city").String()}
 }
 
 // Weather struct
